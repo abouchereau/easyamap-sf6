@@ -14,6 +14,16 @@
         More info on Symfony UX https://ux.symfony.com
     #}
     <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-5 text-center">
+
+            <h1 style="margin:0;"><span class="easyamap easyamap-medium">easy<span>amap</span></span></h1>
+            <h4>{{ setting.name }}</h4>
+
+            <p>
+            <img src="{{ setting.logoLargeUrl }}" style="width:256px;" />
+            </p>
+        </div>
         <div class="col-sm-5">
             <div class="jumbotron">
                 <form action="{{ path('security_login') }}" method="post">
