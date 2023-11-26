@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'symfony_demo_user')]
+#[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     // We can use constants for roles to find usages all over the application rather
@@ -37,6 +37,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // It also prevents from making typo errors.
     final public const ROLE_USER = 'ROLE_USER';
     final public const ROLE_ADMIN = 'ROLE_ADMIN';
+    final public const ROLE_ADHERENT = 'ROLE_ADHERENT';
+    final public const ROLE_REFERENT = 'ROLE_REFERENT';
+    final public const ROLE_FARMER = 'ROLE_FARMER';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -45,7 +48,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::STRING)]
     #[Assert\NotBlank]
-    private ?string $fullName = null;
+    private ?string $firstname = null;
+
+    #[ORM\Column(type: Types::STRING)]
+    #[Assert\NotBlank]
+    private ?string $lastname = null;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\NotBlank]
@@ -68,16 +75,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setFullName(string $fullName): void
-    {
-        $this->fullName = $fullName;
-    }
-
-    public function getFullName(): ?string
-    {
-        return $this->fullName;
     }
 
     public function getUserIdentifier(): string
@@ -137,6 +134,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->roles = $roles;
     }
+
+    /**
+     * @param $role
+     * @return bool
+     */
+    public function hasRole($role):bool {
+        $roles = $this->getRoles();
+        return in_array($role,$roles);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    /**
+     * @param string|null $firstname
+     */
+    public function setFirstname(?string $firstname): void
+    {
+        $this->firstname = $firstname;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+
+    /**
+     * @param string|null $lastname
+     */
+    public function setLastname(?string $lastname): void
+    {
+        $this->lastname = $lastname;
+    }
+
+    /**
+     * @param string|null $lastname
+     */
+    public function setFullName(?string $lastname): void
+    {
+        $this->lastname = $lastname;
+    }
+
+
+
 
     /**
      * Returns the salt that was originally used to encode the password.

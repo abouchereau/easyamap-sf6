@@ -3,6 +3,11 @@ twig:
     form_themes:
         - 'form/layout.html.twig'
         - 'form/fields.html.twig'
+    globals:
+        app_title: Easyamap
+        mail_support: anthony@easyamap.fr
+        version: 1.4.0
+        portail: https://www.easyamap.fr
 
 when@test:
     twig:

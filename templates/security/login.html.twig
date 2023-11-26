@@ -1,5 +1,17 @@
 {% extends 'layout.html.twig' %}
 
+{% block header_title %}Authentification{% endblock %}
+
+{% block header_css %}
+<style>
+.border-primary {
+    border: 1px solid rgb(0, 102, 135);
+    border-radius: 6px !important;
+    box-shadow: 4px 4px 1px rgba(100, 100, 100, 0.3);
+}
+</style>
+{% endblock %}
+
 {% block body %}
     {% if error %}
         <div class="alert alert-danger">
@@ -7,54 +19,66 @@
         </div>
     {% endif %}
 
-    {#
-        This references the Stimulus controller defined in
-        "assets/controllers/login-controller.js".
-        See https://symfony.com/doc/current/frontend/encore/simple-example.html#stimulus-symfony-ux
-        More info on Symfony UX https://ux.symfony.com
-    #}
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-5 text-center">
+    <div class="row hidden-sm hidden-xs">
+        <div class="col text-center" style="height:20px;">
 
-            <h1 style="margin:0;"><span class="easyamap easyamap-medium">easy<span>amap</span></span></h1>
-            <h4>{{ setting.name }}</h4>
-
-            <p>
-            <img src="{{ setting.logoLargeUrl }}" style="width:256px;" />
-            </p>
         </div>
-        <div class="col-sm-5">
-            <div class="jumbotron">
+    </div>
+    <div class="row">
+        <div class="col-md-4 text-center col-md-offset-1">
+             <h1 style="margin:0;"><span class="easyamap easyamap-medium">easy<span>amap</span></span></h1>
+             <h4>{{ setting.name }}</h4>
+             <p class="hidden-sm hidden-xs">
+                <img src="{{ setting.logoLargeUrl }}" style="width:256px;" />
+             </p>
+         </div>
+        <div class="col-md-6">
+            <div class="jumbotron border-primary">
                 <form action="{{ path('security_login') }}" method="post">
                     <fieldset>
-                        <legend><i class="fa fa-lock" aria-hidden="true"></i> {{ 'title.login'|trans }}</legend>
+
                         <div class="form-group">
-                            <label for="username">{{ 'label.username'|trans }}</label>
+                            <label for="username">Nom d'utilisateur ou adresse de courriel</label>
                             <input type="text" id="username" name="_username" value="{{ last_username }}" class="form-control" {{ stimulus_target('login', 'username') }} />
                         </div>
 
                         <div class="form-group form-group-password">
-                            <label for="password">{{ 'label.password'|trans }}</label>
-                            <input type="password" id="password" name="_password" class="form-control" {{ stimulus_target('login', 'password') }} />
-                            <button class="btn btn-primary pull-right" type="button" {{ stimulus_action('login', 'togglePasswordInputType') }}><i class="fa fa-eye"></i></button>
+                            <label for="password">Mot de passe</label>
+                             <input type="password" id="password" name="_password" class="form-control" {{ stimulus_target('login', 'password') }} />
                         </div>
-
+                        <div class="form-group text-right">
+                            <label>
+                                <a href="#">Mot de passe oublié?</a>
+                            </label>
+                        </div>
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" name="_remember_me" checked/>
-                                Keep me logged in
+                                Se souvenir de moi
                             </label>
                         </div>
                         <input type="hidden" name="_target_path" value="{{ app.request.get('redirect_to') }}"/>
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-sign-in" aria-hidden="true"></i> {{ 'action.sign_in'|trans }}
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <span class="glyphicon glyphicon-log-in"></span> Connexion
                         </button>
                     </fieldset>
                 </form>
             </div>
         </div>
+        <div class="row visible-sm visible-xs">
+            <div class="col text-center">
+                <img src="{{ setting.logoLargeUrl }}" style="width:256px;" />
+            </div>
+        </div>
+
+    </div>
+
+
 
 {% endblock %}
 
+
+{% block footer %}
+     {% include  'Partials/_footer.html.twig' with {'setting':  setting} %}
+{% endblock %}

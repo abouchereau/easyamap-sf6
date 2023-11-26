@@ -10,22 +10,20 @@ use App\Util\Cache;
 use App\Util\GitUtils;
 use App\Entity\User;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/'), IsGranted(User::ROLE_USER)]
 class HomeController extends AbstractController
 {
-    #[Route('/home', name: 'index', methods: ['GET'])]
-    public function index(): Response
+    #[Route('/', name: 'index', methods: ['GET'])]
+    public function index(#[CurrentUser] ?User $user): Response
     {
-        die("INDEX");
-        return new Response("HOME");
-        /*$user = $this->getUser();      //null si non authentifié
         $menu = $this->getMenu($user);
 
         return $this->render('Home/index.html.twig',  array(
           'menu' => $menu
-          ));*/
+          ));
     }
     
     public function maintenance() {
@@ -300,10 +298,6 @@ class HomeController extends AbstractController
         return $this->render('Partials/_town.html.twig', array(
             'setting' => $setting
                 ));
-    }
-    
-    public function environment() {
-        return new Response($_SERVER['APP_ENV']);
     }
 
     public function donnees() {

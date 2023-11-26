@@ -2,14 +2,17 @@
 
 namespace App\Repository;
 
+use App\Entity\Setting;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 
 class SettingRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Settting::class);
+        parent::__construct($registry, Setting::class);
     }
     const FILEPATH = '/../../var/cache/setting_env.json';
     const MANIFEST_PATH = '/../../web/manifest/env.json';

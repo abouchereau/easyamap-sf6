@@ -24,6 +24,9 @@ security:
             lazy: true
             provider: database_users
 
+            custom_authenticators:
+                - App\Security\CustomAuthenticator
+
             # This allows the user to login by submitting a username and password
             # Reference: https://symfony.com/doc/current/security/form_login_setup.html
             form_login:
@@ -52,7 +55,7 @@ security:
                 # The route name the user can go to in order to logout
                 path: security_logout
                 # The name of the route to redirect to after logging out
-                target: homepage
+                target: index
                 # Secure the logout against CSRF
                 enable_csrf: true
 

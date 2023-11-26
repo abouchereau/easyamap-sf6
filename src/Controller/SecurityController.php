@@ -12,6 +12,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\SettingRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,6 +41,7 @@ final class SecurityController extends AbstractController
         #[CurrentUser] ?User $user,
         Request $request,
         AuthenticationUtils $helper,
+        SettingRepository $settingRep
     ): Response {
         // if user is already logged in, don't display the login page again
         if ($user) {
@@ -51,10 +53,12 @@ final class SecurityController extends AbstractController
         // locale. This code regenerates the referrer URL whenever the login page is
         // browsed, to ensure that its locale is always the current one.
         $this->saveTargetPath($request->getSession(), 'main', $this->generateUrl('index'));
-        die($_SERVER['APP_ENV']);
+
+        $setting = $settingRep->getFromCache($_SERVER['APP_ENV']);
         return $this->render('security/login.html.twig', [
             // last username entered by the user (if any)
             'last_username' => $helper->getLastUsername(),
+            'setting' => $setting,
             // last authentication error (if any)
             'error' => $helper->getLastAuthenticationError(),
         ]);
