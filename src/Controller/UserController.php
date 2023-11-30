@@ -349,8 +349,9 @@ final class UserController extends AbstractController
     }
 
     #[Route('/donnees_personnelles', name: 'donnees_personnelles', methods: ['GET'])]
-    public function displayCurrentUser() {
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        return $this->render('User/show.html.twig', array('user' => $user));
+    public function displayCurrentUser(
+        #[CurrentUser] User $user
+    ) {
+        return $this->render('user/show.html.twig', array('user' => $user));
     }
 }
