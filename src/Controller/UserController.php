@@ -1,5 +1,6 @@
 <?php
 
+namespace App\Controller;
 /*
  * This file is part of the Symfony package.
  *
@@ -9,11 +10,11 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Controller;
-
 use App\Entity\User;
 use App\Form\ChangePasswordType;
 use App\Form\UserType;
+use App\Repository\SettingRepository;
+use App\Repository\UserRepository;
 use App\Util\PasswordGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Controller used to manage current user. The #[CurrentUser] attribute
@@ -158,7 +160,8 @@ final class UserController extends AbstractController
             'action' => $this->generateUrl('user_create'),
             'method' => 'POST',
             'is_new' => true,
-            'with_address' => $withAddress
+            'with_address' => $withAddress,
+            'from_admin' => false
         ));
 
         $form->add('submit', SubmitType::class, array('label' => 'Create'));
@@ -189,34 +192,6 @@ final class UserController extends AbstractController
 
 
 
-    /**
-     * Displays a form to edit an existing User entity.
-     *
-     */
-//    public function edit($id)
-//    {
-//        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-//
-//        $em = $this->getDoctrine()->getManager();
-//
-//        $entity = $em->getRepository('App\Entity\User')->find($id);
-//
-//        if (!$entity) {
-//            throw $this->createNotFoundException('Unable to find User entity.');
-//        }
-//
-//        $editForm = $this->createEditForm($entity);
-//        $editForm->add('submit', SubmitType::class, array('label' => 'Update'));
-//        $canBeDeleted = $em->getRepository('App\Entity\User')->canBeDeleted($id);
-//        // $deleteForm = $this->createDeleteForm($id);
-//
-//        return $this->render('User/edit.html.twig', array(
-//            'entity'      => $entity,
-//            'form'   => $editForm->createView(),
-//            'can_be_deleted' => $canBeDeleted
-//            //   'delete_form' => $deleteForm->createView(),
-//        ));
-//    }
 
     public function userEdit()
     {
@@ -239,16 +214,9 @@ final class UserController extends AbstractController
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createEditForm(User $entity)
+    private function createEditForm(string $type, mixed $data = null, array $options = [])
     {
-        $em = $this->getDoctrine()->getManager();
-        $withAddress = $em->getRepository('App\Entity\Setting')->get('useAddress',$_SERVER['APP_ENV']);
-        $form = $this->createForm(UserType::class, $entity, array(
-            'action' => $this->generateUrl('user_update', array('id' => $entity->getIdUser())),
-            'method' => 'PUT',
-            'is_new' => false,
-            'with_address' => $withAddress
-        ));
+
 
 
 
@@ -354,4 +322,87 @@ final class UserController extends AbstractController
     ) {
         return $this->render('user/show.html.twig', array('user' => $user));
     }
+
+    #[Route('/donnees_personnelles/edit', name: 'donnees_personnelles_edit', methods: ['GET','POST'])]
+    public function editCurrentUser(
+        #[CurrentUser] User $user,
+        SettingRepository $settingRep,
+        EntityManagerInterface $entityManager,
+        Request $request,
+    )
+    {
+        $withAddress = $settingRep->get('useAddress', $_SERVER['APP_ENV']);
+        $tab = [
+            'with_address' => $withAddress,
+            'is_new' => false,
+            'from_admin' => false
+        ];
+        $form = $this->createForm(UserType::class, $user, $tab);
+        $form->add('submit', SubmitType::class, array('label' => 'Mettre à jour'));
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            return $this->redirectToRoute('donnees_personnelles', [], Response::HTTP_SEE_OTHER);
+        }
+        return $this->render('user/edit.html.twig', array(
+            'entity'      => $user,
+            'form'   => $form,
+        ));
+    }
+
+    #[Route('/donnees_personnelles/mot_de_passe', name: 'donnees_personnelles_mot_de_passe', methods: ['GET','POST'])]
+    public function editPassword(
+        #[CurrentUser] User $user,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher
+    ) {
+
+        $form = $this->createForm(ChangePasswordType::class);
+        $form->add('submit', SubmitType::class, array('label' => 'Mettre à jour'));
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            if (!$this->_mdpIsValid($data->getPassword())) {
+                $this->get('session')->getFlashBag()->add('error', 'Le mot de passe a été mis à jour.');
+            }
+            else {
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $user,
+                    $data->getPassword()
+                );
+                $user->setPassword($hashedPassword);
+                $entityManager->flush();
+                $this->get('session')->getFlashBag()->add('notice', 'Le mot de passe a été mis à jour.');
+                return $this->redirectToRoute('donnees_personnelles', [], Response::HTTP_SEE_OTHER);
+
+            }
+        }
+
+        return $this->render('user/change_password.html.twig', array(
+            'entity'      => $user,
+            'form'   => $form,
+        ));
+    }
+
+    private function _mdpIsValid($password): bool {
+        if (strlen($password)<8) {
+            return false;
+        }
+        if ($password == strtolower($password)) {
+            return false;
+        }
+        if ($password == strtoupper($password)) {
+            return false;
+        }
+        if (!preg_match('~[0-9]+~', $password)) {
+            return false;
+        }
+        if (!preg_match('/[^a-zA-Z\d]/', $password)) {
+            return false;
+        }
+        return true;
+    }
+
 }

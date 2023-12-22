@@ -1,30 +1,22 @@
-{#
-   Each field type is rendered by a template fragment, which is determined
-   by the name of your form type class (DateTimePickerType -> date_time_picker)
-   and the suffix "_widget". This can be controlled by overriding getBlockPrefix()
-   in DateTimePickerType.
+{% block form_row %}
+<div class="form-group">{{ form_errors(form) }}{{ form_label(form) }}{{ form_widget(form) }}</div>
+{% endblock form_row %}
 
-   See https://symfony.com/doc/current/form/create_custom_field_type.html#creating-the-form-type-template
-#}
+{% block entity_row %}
+<div class="form-group entity">{{ form_errors(form) }}{{ form_label(form) }}{{ form_widget(form) }}</div>
+{% endblock entity_row %}
 
-{% block date_time_picker_widget %}
-    <div class="input-group date">
-        {{ block('datetime_widget') }}
-        <div class="input-group-append">
-            <button type="button" class="btn btn-outline-secondary">
-                <span class="fa fa-calendar" aria-hidden="true"></span>
-            </button>
-        </div>
-    </div>
-{% endblock %}
+{% block checkbox_row %}
+<div class="form-group">{{ form_errors(form) }}{{ form_widget(form) }}{{ form_label(form) }}</div>
+{% endblock checkbox_row %}
 
-{% block tags_input_widget %}
-    <div class="input-group">
-        {{ form_widget(form, {'attr': {'data-toggle': 'tagsinput', 'data-tags': tags|json_encode}}) }}
-        <div class="input-group-append">
-            <span class="input-group-text">
-                <span class="fa fa-tags" aria-hidden="true"></span>
-            </span>
-        </div>
-    </div>
-{% endblock %}
+
+{% block checkbox_widget %}
+  <div class="custom-checkbox"><input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{% endblock checkbox_widget %}
+
+{% block checkbox_label %}
+    <label for="{{ id }}"><span></span></label>
+    <label for="{{ id }}">{{ label|raw }}</label>
+</div>
+{% endblock checkbox_label %}

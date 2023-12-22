@@ -1,59 +1,74 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Form;
 
-use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
-/**
- * Defines the form used to edit an user.
- *
- * @author Romain Monteil <monteil.romain@gmail.com>
- */
-final class UserType extends AbstractType
-{
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+class UserType extends AbstractType
+{    
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // For the full reference of options defined by each form field type
-        // see https://symfony.com/doc/current/reference/forms/types.html
-
-        // By default, form fields include the 'required' attribute, which enables
-        // the client-side form validation. This means that you can't test the
-        // server-side validation errors from the browser. To temporarily disable
-        // this validation, set the 'required' attribute to 'false':
-        // $builder->add('title', null, ['required' => false, ...]);
-
         $builder
-            ->add('username', TextType::class, [
-                'label' => 'label.username',
-                'disabled' => true,
-            ])
-            ->add('fullName', TextType::class, [
-                'label' => 'label.fullname',
-            ])
-            ->add('email', EmailType::class, [
-                'label' => 'label.email',
-            ])
-        ;
+            ->add('email', EmailType::class,    array('label' => 'E-mail'        ,'required' => false))
+            ->add('firstname',TextType::class,  array('label' => 'Prénom'        ,'required' => false))
+            ->add('lastname',TextType::class,   array('label' => 'Nom *'         ,'required' => true))
+            ->add('username',TextType::class,   array('label' => 'Identifiant de connexion * (généralement identique au nom)' ,'required' => true));
+        if ($options['from_admin']) {
+            $builder->add('password',PasswordType::class,   array('label' => 'Mot de passe *','required' => true));
+            $builder->add('isAdherent', CheckboxType::class, array('label' => 'Adhérent', 'required' => false, 'attr' => array('checked' => 'checked')));
+            $builder->add('isAdmin', CheckboxType::class, array('label' => 'Administrateur', 'required' => false));
+        }
+        if ($options['with_address']) {
+            $builder->add('tel1',TextType::class, array('label'=>'Tel. 1', 'required' => false));
+            $builder->add('tel2',TextType::class, array('label'=>'Tel. 2', 'required' => false));
+            $builder->add('address',TextType::class, array('label'=>'Adresse', 'required' => false));
+            $builder->add('zipcode',TextType::class, array('label'=>'Code Postal', 'required' => false));
+            $builder->add('town',TextType::class, array('label'=>'Ville', 'required' => false));            
+        }
+        
+        if ($options['is_new']) {
+            $builder->add('sendMail',CheckboxType::class,array(
+                'label' => 'Envoyer un mail à l\'adhérent',
+                'required' => false, 
+                'mapped' => false,
+                'attr' => array('checked'   => 'checked')));
+        }
     }
-
-    public function configureOptions(OptionsResolver $resolver): void
+    
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
+        $resolver->setDefaults(array(
+            'data_class' => 'App\Entity\User'
+        ));
+    }
+    
+    public function configureOptions( OptionsResolver $resolver ) {
+        $resolver->setDefaults( [
+          'is_new' => null,
+          'with_address' => null,
+          'from_admin' => false
+        ] );
+    }
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'amap_orderbundle_user';
     }
 }

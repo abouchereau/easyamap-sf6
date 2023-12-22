@@ -30,9 +30,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Ryan Weaver <weaverryan@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UserTestRepository::class)]
 #[ORM\Table(name: 'user')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class UserTest implements UserInterface, PasswordAuthenticatedUserInterface
 {
 
     use IsActiveDefaultTrueTrait;
@@ -94,7 +94,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      **/
 
     //private $farms;
-
 
     #[ORM\Column(name:"last_connection", type: Types::DATETIME_MUTABLE, nullable:true)]
     private ?\DateTime $lastConnection = null;
@@ -326,6 +325,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->lastConnection = $lastConnection;
     }
+
 
     /**
      * @return string|null
