@@ -19,6 +19,7 @@ use App\Util\PasswordGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -338,7 +339,6 @@ final class UserController extends AbstractController
             'from_admin' => false
         ];
         $form = $this->createForm(UserType::class, $user, $tab);
-        $form->add('submit', SubmitType::class, array('label' => 'Mettre à jour'));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
@@ -359,7 +359,6 @@ final class UserController extends AbstractController
     ) {
 
         $form = $this->createForm(ChangePasswordType::class);
-        $form->add('submit', SubmitType::class, array('label' => 'Mettre à jour'));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

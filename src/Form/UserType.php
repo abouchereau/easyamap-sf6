@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -45,6 +47,9 @@ class UserType extends AbstractType
                 'mapped' => false,
                 'attr' => array('checked'   => 'checked')));
         }
+
+        $builder->add('submit', SubmitType::class, ['label' => 'Mettre à jour','attr' => ['class' => 'pull-right btn-primary']]);
+        $builder->add('cancel', ButtonType::class, ['label' => 'Annuler','attr' => ['onclick'=>'window.history.go(-1); return false;']]);
     }
     
     /**
