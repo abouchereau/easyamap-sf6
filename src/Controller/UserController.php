@@ -363,17 +363,18 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            if (!$this->_mdpIsValid($data->getPassword())) {
-                $this->get('session')->getFlashBag()->add('error', 'Le mot de passe a été mis à jour.');
+            if (!$this->_mdpIsValid($data['password'])) {
+
+                $this->addFlash('error','Le mot de passe doit respecter les exigences de sécurité.');
             }
             else {
                 $hashedPassword = $passwordHasher->hashPassword(
                     $user,
-                    $data->getPassword()
+                    $data['password']
                 );
                 $user->setPassword($hashedPassword);
                 $entityManager->flush();
-                $this->get('session')->getFlashBag()->add('notice', 'Le mot de passe a été mis à jour.');
+                $this->addFlash('notice','Le mot de passe a été mis à jour.');
                 return $this->redirectToRoute('donnees_personnelles', [], Response::HTTP_SEE_OTHER);
 
             }

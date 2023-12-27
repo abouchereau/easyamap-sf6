@@ -1,1 +1,2 @@
 ALTER TABLE user RENAME COLUMN id_user TO id;
+ALTER TABLE user ADD COLUMN reset_token VARCHAR(100);

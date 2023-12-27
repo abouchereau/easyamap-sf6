@@ -119,6 +119,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 255)]
     private $town;
 
+    #[ORM\Column(type: 'string', length: 100)]
+    private $resetToken;
 
     public function getId(): ?int
     {
@@ -407,5 +409,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->town = $town;
     }
 
+// ...
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
+    }
 
 }

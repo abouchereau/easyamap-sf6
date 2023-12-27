@@ -18,7 +18,7 @@
   <body>
     {% include 'Partials/_header.html.twig' with {'title':  block('header_title')} %}
       <div class="container">  
-      {#{% include 'Partials/_flashMessage.html.twig' %}#}
+      {% include 'Partials/_flashMessage.html.twig' %}
           
       {% block body %}{% endblock %}  
       </div>
@@ -30,8 +30,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 {% block footer_js_before %}{# especially for datatable #}{% endblock %}
 
-{# <script type="text/javascript" src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/amap.js') }}"></script>#}
+<script type="text/javascript" src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/amap.js') }}"></script>
 {% block footer_js %}{% endblock %}
   </body>
 </html>
