@@ -72,6 +72,8 @@ security:
         # this is a catch-all for the admin area
         # additional security lives in the controllers
         - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/oubli-mot-de-passe$, roles: PUBLIC_ACCESS }
+        - { path: ^/oubli-pass, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
     # The ROLE_ADMIN role inherits from the ROLE_USER role

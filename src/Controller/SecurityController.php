@@ -20,6 +20,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use App\Repository\UserRepository;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\Form\ResetPasswordRequestFormType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Form\ResetPasswordFormType;
 
 /**
  * Controller used to manage the application security.
@@ -82,7 +91,7 @@ final class SecurityController extends AbstractController
         UserRepository $usersRepository,
         TokenGeneratorInterface $tokenGenerator,
         EntityManagerInterface $entityManager,
-        SendMailService $mail
+        MailerInterface $mailer
     ): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
@@ -103,25 +112,31 @@ final class SecurityController extends AbstractController
 
                 // On génère un lien de réinitialisation du mot de passe
                 $url = $this->generateUrl('reset_pass', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+                die($url);
+                $txt = "Bonjour ".$user->getFirstname()." ".$user->getLastname().",
 
-                // On crée les données du mail
-                $context = compact('url', 'user');
+Il y a eu une demande de changement de mot de passe !
 
+Si vous n'avez pas fait cette demande, veuillez ignorer cet e-mail.
+
+Sinon, veuillez cliquer sur ce lien pour modifier votre mot de passe : ".$url."";
                 // Envoi du mail
-                $mail->send(
-                    'no-reply@easyamap.fr',
-                    $user->getEmail(),
-                    'Réinitialisation de mot de passe',
-                    'password_reset',
-                    $context
-                );
+
+                $email = (new Email())
+                    ->from("no-reply@easyamap.fr")
+                    ->to($user->getEmail())
+                    ->subject('Réinitialisation de mot de passe',)
+                    ->text($txt);
+
+                $mailer->send($email);
+
 
                 $this->addFlash('success', 'Email envoyé avec succès');
-                return $this->redirectToRoute('security_login');
+                //return $this->redirectToRoute('security_login');
             }
             // $user est null
-            $this->addFlash('danger', 'Un problème est survenu');
-            return $this->redirectToRoute('security_login');
+            $this->addFlash('success', 'Un e-mail contenant un lien de réinitialisation du mot de passe vous a été envoyé (si votre adresse correspond bien a un compte enregistré)');
+           // return $this->redirectToRoute('security_login');
         }
 
         return $this->render('security/reset_password_request.html.twig', [
@@ -149,31 +164,37 @@ final class SecurityController extends AbstractController
             $form->handleRequest($request);
 
             if($form->isSubmitted() && $form->isValid()){
-                // On efface le token
-                $user->setResetToken('');
 
+                $data = $form->getData();
+                if (!$this->_mdpIsValid($data['password'])) {
+                    $this->addFlash('warning','Le mot de passe doit respecter les exigences de sécurité.');
+                }
+                else {
+                    // On efface le token
+                    $user->setResetToken('');
 
-// On enregistre le nouveau mot de passe en le hashant
-                $user->setPassword(
-                    $passwordHasher->hashPassword(
-                        $user,
-                        $form->get('password')->getData()
-                    )
-                );
-                $entityManager->persist($user);
-                $entityManager->flush();
+                    // On enregistre le nouveau mot de passe en le hashant
+                    $user->setPassword(
+                        $passwordHasher->hashPassword(
+                            $user,
+                            $form->get('password')->getData()
+                        )
+                    );
+                    $entityManager->persist($user);
+                    $entityManager->flush();
 
-                $this->addFlash('success', 'Mot de passe changé avec succès');
-                return $this->redirectToRoute('app_login');
+                    $this->addFlash('success', 'Mot de passe changé avec succès');
+                    return $this->redirectToRoute('security_login');
+                }
             }
 
             return $this->render('security/reset_password.html.twig', [
-                'passForm' => $form->createView()
+                'form' => $form->createView()
             ]);
         }
 
         // Si le token est invalide on redirige vers le login
         $this->addFlash('danger', 'Jeton invalide');
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('security_login');
     }
 }

@@ -386,23 +386,6 @@ final class UserController extends AbstractController
         ));
     }
 
-    private function _mdpIsValid($password): bool {
-        if (strlen($password)<8) {
-            return false;
-        }
-        if ($password == strtolower($password)) {
-            return false;
-        }
-        if ($password == strtoupper($password)) {
-            return false;
-        }
-        if (!preg_match('~[0-9]+~', $password)) {
-            return false;
-        }
-        if (!preg_match('/[^a-zA-Z\d]/', $password)) {
-            return false;
-        }
-        return true;
-    }
+
 
 }

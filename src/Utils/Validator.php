@@ -39,15 +39,17 @@ final class Validator
     public function validatePassword(?string $plainPassword): string
     {
         if (empty($plainPassword)) {
-            throw new InvalidArgumentException('The password can not be empty.');
+            throw new InvalidArgumentException('Le mot de passe ne peut pas être vide');
         }
 
-        if (u($plainPassword)->trim()->length() < 6) {
-            throw new InvalidArgumentException('The password must be at least 6 characters long.');
+        if (!$this->_mdpIsValid($plainPassword)) {
+            throw new InvalidArgumentException('Le mot de passe doit respecter les exigences de sécurité.');
         }
 
         return $plainPassword;
     }
+
+
 
     public function validateEmail(?string $email): string
     {

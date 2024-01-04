@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator as CustomAssert;
 
 /**
  * Defines the properties of the User entity to represent the application users.
@@ -70,6 +71,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(type: Types::STRING)]
+    #[CustomAssert\PasswordSecurityValidator]
     private ?string $password = null;
 
     /**
