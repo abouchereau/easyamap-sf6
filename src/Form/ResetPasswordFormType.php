@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Validator\PasswordSecurity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -17,6 +18,7 @@ class ResetPasswordFormType extends AbstractType
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe ne correspondent pas.',
+                'constraints' => [new PasswordSecurity('strict')],
                 'options' => ['attr' => ['class' => 'password-field']],
                 'required' => true,
                 'first_options'  => ['label' => 'Entrez votre nouveau mot de passe'],

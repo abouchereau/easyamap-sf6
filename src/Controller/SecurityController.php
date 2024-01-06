@@ -165,27 +165,21 @@ Sinon, veuillez cliquer sur ce lien pour modifier votre mot de passe : ".$url.""
 
             if($form->isSubmitted() && $form->isValid()){
 
-                $data = $form->getData();
-                if (!$this->_mdpIsValid($data['password'])) {
-                    $this->addFlash('warning','Le mot de passe doit respecter les exigences de sécurité.');
-                }
-                else {
-                    // On efface le token
-                    $user->setResetToken('');
+                // On efface le token
+                $user->setResetToken('');
 
-                    // On enregistre le nouveau mot de passe en le hashant
-                    $user->setPassword(
-                        $passwordHasher->hashPassword(
-                            $user,
-                            $form->get('password')->getData()
-                        )
-                    );
-                    $entityManager->persist($user);
-                    $entityManager->flush();
+                // On enregistre le nouveau mot de passe en le hashant
+                $user->setPassword(
+                    $passwordHasher->hashPassword(
+                        $user,
+                        $form->get('password')->getData()
+                    )
+                );
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-                    $this->addFlash('success', 'Mot de passe changé avec succès');
-                    return $this->redirectToRoute('security_login');
-                }
+                $this->addFlash('success', 'Mot de passe changé avec succès');
+                return $this->redirectToRoute('security_login');
             }
 
             return $this->render('security/reset_password.html.twig', [

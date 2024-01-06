@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Validator\PasswordSecurity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -24,6 +25,7 @@ class ChangePasswordType extends AbstractType
             'type' => PasswordType::class,
             'invalid_message' => 'Les mots de passe ne correspondent pas.',
             'options' => ['attr' => ['class' => 'password-field']],
+            'constraints' => [new PasswordSecurity('strict')],
             'required' => true,
             'first_options'  => ['label' => 'Nouveau mot de passe *'],
             'second_options' => ['label' => 'Confirmer nouveau mot de passe *'],

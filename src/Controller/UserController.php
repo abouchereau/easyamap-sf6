@@ -363,21 +363,21 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            if (!$this->_mdpIsValid($data['password'])) {
+           /* if (!$this->_mdpIsValid($data['password'])) {
 
                 $this->addFlash('error','Le mot de passe doit respecter les exigences de sécurité.');
             }
-            else {
-                $hashedPassword = $passwordHasher->hashPassword(
-                    $user,
-                    $data['password']
-                );
-                $user->setPassword($hashedPassword);
-                $entityManager->flush();
-                $this->addFlash('notice','Le mot de passe a été mis à jour.');
-                return $this->redirectToRoute('donnees_personnelles', [], Response::HTTP_SEE_OTHER);
+            else {*/
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $data['password']
+            );
+            $user->setPassword($hashedPassword);
+            $entityManager->flush();
+            $this->addFlash('success','Le mot de passe a été mis à jour.');
+            return $this->redirectToRoute('donnees_personnelles', [], Response::HTTP_SEE_OTHER);
 
-            }
+          /*  }*/
         }
 
         return $this->render('user/change_password.html.twig', array(
