@@ -1,41 +1,33 @@
 <?php
-
 namespace App\Tests\Validator;
 
-use App\Validator\ContainsAlphanumeric;
-use App\Validator\ContainsAlphanumericValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use App\Validator\PasswordSecurityValidator;
+use App\Validator\PasswordSecurity;
 
-class ContainsAlphanumericValidatorTest extends ConstraintValidatorTestCase
+class PasswordSecurityValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): ConstraintValidatorInterface
     {
         return new PasswordSecurityValidator();
     }
 
-    public function testNullIsValid(): void
+    public function testPasswordValid(): void
     {
-        $this->validator->validate(null, new PasswordSecurity());
-
-        $this->buildViolation('myMessage')
-            ->assertRaised();
+        $this->validator->validate("Azerty321*", new PasswordSecurity('strict'));
+        $this->assertNoViolation();
     }
 
-    /**
-    * @dataProvider provideInvalidConstraints
-    */
-    public function testTrueIsInvalid(PasswordSecurity $constraint): void
+    public function testPasswordNotValid1(): void
     {
-        $this->validator->validate('Azerty123*', $constraint);
-
-        $this->buildViolation('myMessage')
-        ->assertRaised();
+        $this->validator->validate("azerty321*", new PasswordSecurity('strict'));
+        $this->buildViolation("Le mot de passe doit respecter les exigences de sécurité.")->assertRaised();
     }
 
-    public function provideInvalidConstraints(): \Generator
+    public function testPasswordNotValid2(): void
     {
-        yield [new PasswordSecurity(message: 'aze')];
-    // ...
+        $this->validator->validate("Azerty321", new PasswordSecurity('strict'));
+        $this->buildViolation("Le mot de passe doit respecter les exigences de sécurité.")->assertRaised();
     }
 }
