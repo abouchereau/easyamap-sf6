@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/'), IsGranted(User::ROLE_USER)]
-class HomeController extends AbstractController
+class HomeController extends AbstractController implements TokenAuthenticatedController
 {
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(#[CurrentUser] ?User $user): Response

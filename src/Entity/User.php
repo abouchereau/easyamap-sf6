@@ -16,6 +16,7 @@ use App\Entity\Traits\IsActiveDefaultTrueTrait;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -172,10 +173,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
 
         // guarantees that a user always has at least one role for security
-        if (empty($roles)) {
-            $roles[] = self::ROLE_USER;
-        }
 
+        $roles[] = self::ROLE_USER;
+        $session = new Session();
+
+
+        if ($session->has('roles')) {
+            $rolesStr = $session->get('roles');
+            if (strpos($rolesStr,'1') !== false)
+                $roles[] = self::ROLE_USER;
+            if (strpos($rolesStr,'2') !== false)
+                $roles[] = self::ROLE_ADHERENT;
+            if (strpos($rolesStr,'3') !== false)
+                $roles[] = self::ROLE_REFERENT;
+            if (strpos($rolesStr,'4') !== false)
+                $roles[] = self::ROLE_FARMER;
+            if (strpos($rolesStr,'5') !== false) {
+                $roles[] = self::ROLE_ADMIN;
+                $roles[] = self::ROLE_REFERENT;
+            }
+        }
         return array_unique($roles);
     }
 
