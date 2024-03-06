@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Util\Cache;
 use App\Util\GitUtils;
 use App\Entity\User;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -19,6 +20,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(#[CurrentUser] ?User $user): Response
     {
+
         $menu = $this->getMenu($user);
 
         return $this->render('Home/index.html.twig',  array(
@@ -32,7 +34,12 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     
     protected function getMenu($user)
     {
+        $session = new Session();
+        if (!$session->has('roles') && $user != null) {
+            $usersRepository->loadRoles($user);
+        }
         $menu = array();
+        //die(print_r($user->getRoles(),1));
         if ($user->hasRole(User::ROLE_FARMER)) {
             $menu['farmer'] = $this->getMenuFarmer($user);
         }

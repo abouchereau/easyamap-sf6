@@ -43,6 +43,8 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     {
         $entityManager = $this->getEntityManager();
 
+        $session = new Session();
+        $session->remove('roles');
         return $entityManager->createQuery(
             'SELECT u
                 FROM App\Entity\User u
@@ -55,7 +57,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function loadRoles($user)
     {
-
+        die("LOAD ROLES");
         //1: user,2: adherent, 3:referent, 4:farmer, 5:admin
         $rolesStr = '1';
         //$em = $this->getEntityManager();

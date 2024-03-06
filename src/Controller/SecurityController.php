@@ -16,6 +16,7 @@ use App\Repository\SettingRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -50,7 +51,8 @@ final class SecurityController extends AbstractController
         #[CurrentUser] ?User $user,
         Request $request,
         AuthenticationUtils $helper,
-        SettingRepository $settingRep
+        SettingRepository $settingRep,
+        UserRepository $usersRepository
     ): Response {
         // if user is already logged in, don't display the login page again
         if ($user) {
