@@ -57,7 +57,6 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function loadRoles($user)
     {
-        die("LOAD ROLES");
         //1: user,2: adherent, 3:referent, 4:farmer, 5:admin
         $rolesStr = '1';
         //$em = $this->getEntityManager();

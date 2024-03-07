@@ -34,10 +34,6 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     
     protected function getMenu($user)
     {
-        $session = new Session();
-        if (!$session->has('roles') && $user != null) {
-            $usersRepository->loadRoles($user);
-        }
         $menu = array();
         //die(print_r($user->getRoles(),1));
         if ($user->hasRole(User::ROLE_FARMER)) {
@@ -85,13 +81,13 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     
     protected function getMenuAdherent($user)
     {
-        $em = $this->getDoctrine()->getManager();        
+        /*$em = $this->getDoctrine()->getManager();
         $contracts = $em->getRepository('App\Entity\Contract')->getActiveContracts();
         $nb_not_received = $em->getRepository('App\Entity\Payment')->getNbNotReceived($user);
         $payment_descr = '('.$nb_not_received.' non reçu'.($nb_not_received>1?'s':'').')';
-
-        $list = array();
-        $list[] = array(
+*/
+        $list = [];
+/*        $list[] = array(
                 $this->generateUrl('products_next_distribution'),
                 'shopping-cart',
                 'Prochaine distribution',
@@ -101,7 +97,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
                 $this->generateUrl('contrat_list'),
                 'list-alt',
                 'Contrats ('.count($contracts).' en cours)',
-                ''/*implode('<br />', $contracts)*/
+                ''
                 );
         $list[] = array(
                 $this->generateUrl('paiements_adherent',['received'=>'2']) ,
@@ -124,13 +120,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
                     'Rapports de distribution',
                     'Contrôles de livraison, bilan distribution'
                     );
-        }
-     /*   $list[] = array(
-             $this->generateUrl('payment_history_adherent'),
-             'plus',
-             'Somme des paiements',
-             'Somme des paiements par annnée et par producteur.'
-             );*/
+        }*/
         return $list;
     }
     

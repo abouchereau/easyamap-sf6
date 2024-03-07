@@ -303,7 +303,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return bool
      */
-    public function isAdmin(): bool
+    public function getIsAdmin(): bool
     {
         return $this->isAdmin;
     }
@@ -319,7 +319,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return bool
      */
-    public function isAdherent(): bool
+    public function getIsAdherent(): bool
     {
         return $this->isAdherent;
     }

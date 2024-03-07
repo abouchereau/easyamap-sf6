@@ -13,15 +13,15 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-
+use Symfony\Component\Security\Core\Security;
 class TokenSubscriber implements EventSubscriberInterface
 {
     public function __construct(EntityManagerInterface $entityManager,
                                  UserRepository $usersRepository,
-                                 #[CurrentUser] ?User $user) {
+                                Security $security) {
         $this->usersRepository = $usersRepository;
         $this->entityManager = $entityManager;
-        $this->user = $user;
+        $this->user = $security->getUser();
     }
 
     public function onKernelController(ControllerEvent $event, string $what, TraceableEventDispatcher $eventDispatcher): void
