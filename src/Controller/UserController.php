@@ -36,7 +36,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  *
  * @author Romain Monteil <monteil.romain@gmail.com>
  */
-#[Route('/profile'), IsGranted(User::ROLE_USER)]
+#[Route('/user'), IsGranted(User::ROLE_USER)]
 final class UserController extends AbstractController
 {
     #[Route('/edit', name: 'user_edit', methods: ['GET', 'POST'])]
@@ -83,22 +83,14 @@ final class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * Lists all User entities.
-     *
-     */
-    public function index()
-    {
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        //die(var_dump($user->getRoles()));
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('App\Entity\User')->findAllOrderByLastname();
-
-        $withAddress = $em->getRepository('App\Entity\Setting')->get('useAddress', $_SERVER['APP_ENV']);
-
+    #[Route('/', name: 'user', methods: ['GET']), IsGranted(User::ROLE_ADMIN)]
+    public function index(
+        #[CurrentUser] User $user,
+        UserRepository $userRepository,
+        SettingRepository $settingRepository
+    ) {
+        $entities = $userRepository->findAllOrderByLastname();
+        $withAddress = $settingRepository->get('useAddress', $_SERVER['APP_ENV']);
         return $this->render('User/index.html.twig', array(
             'entities' => $entities,
             'withAddress' => $withAddress
@@ -170,21 +162,13 @@ final class UserController extends AbstractController
         return $form;
     }
 
-    /**
-     * Displays a form to create a new User entity.
-     *
-     */
+    #[Route('/new', name: 'user_new', methods: ['GET']), IsGranted(User::ROLE_ADMIN)]
     public function new()
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $entity = new User();
         $password = PasswordGenerator::make();
         $entity->setPassword($password);
-        $form   = $this->createCreateForm($entity);
-
-
-
+        $form = $this->createCreateForm($entity);
         return $this->render('User/new.html.twig', array(
             'entity' => $entity,
             'form'   => $form->createView(),

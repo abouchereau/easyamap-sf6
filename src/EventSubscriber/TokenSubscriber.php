@@ -21,7 +21,6 @@ class TokenSubscriber implements EventSubscriberInterface
                                 Security $security) {
         $this->usersRepository = $usersRepository;
         $this->entityManager = $entityManager;
-        $this->user = $security->getUser();
     }
 
     public function onKernelController(ControllerEvent $event, string $what, TraceableEventDispatcher $eventDispatcher): void
@@ -33,11 +32,6 @@ class TokenSubscriber implements EventSubscriberInterface
             $em->getRepository('App\Entity\Booth')->unlockContract($previous_url,$user);
         }
 */
-        //s'assurer que la session n'a pas expiré
-        $session = new Session();
-        if (!$session->has('roles') && $this->user != null) {
-            $this->usersRepository->loadRoles($this->user);
-        }
 
     }
 

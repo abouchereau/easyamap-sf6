@@ -70,11 +70,13 @@
 </div>
 <div class="row">  
 {% for bloc in menu.admin %}
-  <div class="col-md-3">    
-    <div class="panel panel-primary" onclick="window.location.href='{{ bloc[0] }}';">
-      <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-{{ bloc[1] }}"></span> {{ bloc[2] }}</h3></div>
-      <div class="panel-body text-muted"><small>{{ bloc[3] }}</small></div>
-    </div>
+  <div class="col-md-3">
+    <a href="{{ bloc[0] }}" class="no-underline">
+        <div class="panel panel-primary">
+          <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-{{ bloc[1] }}"></span> {{ bloc[2] }}</h3></div>
+          <div class="panel-body bg-primary"><small>{{ bloc[3] }}</small></div>
+        </div>
+    </a>
   </div>
 {% endfor %}  
 </div>

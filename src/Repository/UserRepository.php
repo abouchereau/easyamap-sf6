@@ -49,37 +49,19 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
             'SELECT u
                 FROM App\Entity\User u
                 WHERE u.username = :query
-                OR u.email = :query'
-        )
+                OR u.email = :query')
             ->setParameter('query', $usernameOrEmail)
             ->getOneOrNullResult();
     }
 
-    public function loadRoles($user)
+    public function findAllOrderByLastname()
     {
-        //1: user,2: adherent, 3:referent, 4:farmer, 5:admin
-        $rolesStr = '1';
-        //$em = $this->getEntityManager();
-        if (is_object($user)) {
-
-            if ($user->getIsAdherent()) {
-                $rolesStr .= '2';
-            }
-
-            /*  $ref = $em->getRepository('App\Entity\Referent')->findOneBy(array('fkUser'=>$user));
-
-              if ($ref != null)
-                  $rolesStr .= '3';
-
-              $farm = $em->getRepository('App\Entity\Farm')->findOneBy(array('fkUser'=>$user));
-              if ($farm != null)
-                  $rolesStr .= '4';*/
-
-            if ($user->getIsAdmin()) {
-                $rolesStr .= '5';
-            }
-        }
-        $session = new Session();
-        $session->set('roles', $rolesStr);
+        return $this
+            ->createQueryBuilder('u')
+            ->addOrderBy('u.isActive', 'DESC')
+            ->addOrderBy('u.lastname')
+            ->getQuery()
+            ->getResult();
     }
+
 }

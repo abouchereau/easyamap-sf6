@@ -31,7 +31,7 @@
         </thead>
         <tbody>
         {% for entity in entities %}
-            <tr onclick="window.location.href='{{ path('user_edit', { 'id': entity.idUser }) }}';"{% if not entity.isActive %} class="text-muted"{% endif %}>
+            <tr onclick="window.location.href='{{ path('user_edit', { 'id': entity.id }) }}';"{% if not entity.hasRole('ROLE_USER') %} class="text-muted"{% endif %}>
                 <td>{{ entity }}</td>
                 <td><small>{{ entity.email }}</small></td>
                 {% if withAddress %}

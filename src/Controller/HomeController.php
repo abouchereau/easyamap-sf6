@@ -126,7 +126,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     
     protected function getMenuReferent($user)
     {
-        $list = array();
+        $list = [];
         if (!$user->hasRole(User::ROLE_ADMIN))
         {
         $list[] = array(
@@ -136,7 +136,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
             'Liste des produits à livrer aux prochaines distributions.'
             );
         }
-        $list[] = array(
+      /*  $list[] = array(
             $this->generateUrl('paiements_referent'),
             'euro',
             'Réception des paiements',
@@ -187,7 +187,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
              'Reports de livraison',
              'Définir les reports de produits'
              );
-         
+         */
        /*  $list[] = array(
              $this->generateUrl('payment_history'),
              'plus',
@@ -199,15 +199,15 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
     
     protected function getMenuAdmin($user)
     {
-        $em = $this->getDoctrine()->getManager();      
-        $list = array();
-        $list[] = array(
+        //$em = $this->getDoctrine()->getManager();
+        $list = [];
+       $list[] = array(
             $this->generateUrl('user'),
             'user',
             'Adhérents',
             'Ajouter / modifier / supprimer un adhérent.'
             );
-        $list[] = array(
+       /*  $list[] = array(
             $this->generateUrl('farm'),
             'grain',
             'Producteurs',
@@ -252,7 +252,7 @@ class HomeController extends AbstractController implements TokenAuthenticatedCon
                 'Données de l\'application',
                 'Visualiser et récupérer les données de l\'application.'
             );
-        }
+        }*/
         return $list;
     }
     

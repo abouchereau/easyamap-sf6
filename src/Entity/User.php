@@ -88,15 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name:"is_adherent", type: Types::BOOLEAN, nullable:false)]
     private bool $isAdherent;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Farm")
-     * @JoinTable(name="referent",
-     *      joinColumns={@JoinColumn(name="fk_user", referencedColumnName="id_user")},
-     *      inverseJoinColumns={@JoinColumn(name="fk_farm", referencedColumnName="id_farm")}
-     *      )
-     **/
 
-    //private $farms;
 
 
     #[ORM\Column(name:"last_connection", type: Types::DATETIME_MUTABLE, nullable:true)]
@@ -124,6 +116,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 100)]
     private $resetToken;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Farm")
+     * @JoinTable(name="referent",
+     *      joinColumns={@JoinColumn(name="id_user", referencedColumnName="id")},
+     *      inverseJoinColumns={@JoinColumn(name="id_farm", referencedColumnName="id")}
+     *      )
+     **/
+    private Collection $farms;
 
     public function getId(): ?int
     {
@@ -170,30 +171,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-
-        // guarantees that a user always has at least one role for security
-
-        $roles[] = self::ROLE_USER;
-        $session = new Session();
-
-
-        if ($session->has('roles')) {
-            $rolesStr = $session->get('roles');
-            if (strpos($rolesStr,'1') !== false)
-                $roles[] = self::ROLE_USER;
-            if (strpos($rolesStr,'2') !== false)
-                $roles[] = self::ROLE_ADHERENT;
-            if (strpos($rolesStr,'3') !== false)
-                $roles[] = self::ROLE_REFERENT;
-            if (strpos($rolesStr,'4') !== false)
-                $roles[] = self::ROLE_FARMER;
-            if (strpos($rolesStr,'5') !== false) {
-                $roles[] = self::ROLE_ADMIN;
-                $roles[] = self::ROLE_REFERENT;
-            }
-        }
-        return array_unique($roles);
+        return $this->roles;
     }
 
     /**
@@ -440,6 +418,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->resetToken = $resetToken;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->lastname.' '.$this->firstname;
     }
 
 }

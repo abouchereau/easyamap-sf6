@@ -6,7 +6,7 @@ body > .container {
 * {
   transition-property: background-color, border-color, color, opacity, box-shadow;
   transition-timing-function: linear;
-  transition-duration: 0.15s;
+  transition-duration: 0.1s;
 }
 #loader {
   display:none;
@@ -62,15 +62,7 @@ body > .container {
     backgound-color: #DDD;
     
 }
-/*
-.td-relative {
-    position:relative;    
-}
-.btn-inscription {
-    position:absolute;
-    bottom:0;
-    right:0;
-}*/
+
 table  {
     background-color:#FFF;
 }
@@ -115,16 +107,25 @@ p.bg-info {
     padding:5px;
 }
 /*  PAGE d'ACCUEIL   */
-
-.panel {
-  cursor:pointer;
-  height:130px;
+a.no-underline:hover {
+    text-decoration: none;
 }
-
+.panel {
+    border-radius: 10px;
+    border: none;
+}
+.panel h3 {
+    font-weight: bold;
+    text-align:center;
+}
 .panel-body {
     padding:10px;
+    height:70px;
+    border-radius: 0 0 10px 10px;
 }
-
+.panel-heading {
+    border-radius: 10px 10px 0 0 ;
+}
 .panel:hover {
   box-shadow: 1px 1px 5px #666;
 }
