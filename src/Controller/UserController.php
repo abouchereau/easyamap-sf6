@@ -39,13 +39,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[Route('/user'), IsGranted(User::ROLE_USER)]
 final class UserController extends AbstractController
 {
-    #[Route('/edit', name: 'user_edit', methods: ['GET', 'POST'])]
+    #[Route('/edit/{id}', name: 'user_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[CurrentUser] User $user,
         Request $request,
         EntityManagerInterface $entityManager,
+        ?string $id = null
     ): Response {
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, ["with_address"=>$id!=null]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -96,14 +97,10 @@ final class UserController extends AbstractController
             'withAddress' => $withAddress
         ));
     }
-    /**
-     * Creates a new User entity.
-     *
-     */
+
+    #[Route('/create', name: 'user_create', methods: ['POST']), IsGranted(User::ROLE_ADMIN)]
     public function create(Request $request)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $entity = new User();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
@@ -145,10 +142,8 @@ final class UserController extends AbstractController
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createCreateForm(User $entity)
+    private function createCreateForm(User $entity, bool $withAddress)
     {
-        $em = $this->getDoctrine()->getManager();
-        $withAddress = $em->getRepository('App\Entity\Setting')->get('useAddress', $_SERVER['APP_ENV']);
         $form = $this->createForm(UserType::class, $entity, array(
             'action' => $this->generateUrl('user_create'),
             'method' => 'POST',
@@ -163,12 +158,10 @@ final class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'user_new', methods: ['GET']), IsGranted(User::ROLE_ADMIN)]
-    public function new()
+    public function new(SettingRepository $settingRepository)
     {
         $entity = new User();
-        $password = PasswordGenerator::make();
-        $entity->setPassword($password);
-        $form = $this->createCreateForm($entity);
+        $form = $this->createCreateForm($entity, $settingRepository->get('useAddress', $_SERVER['APP_ENV']));
         return $this->render('User/new.html.twig', array(
             'entity' => $entity,
             'form'   => $form->createView(),

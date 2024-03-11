@@ -106,8 +106,12 @@ p.bg-info {
     border-radius:10px;
     padding:5px;
 }
+.btn {
+    border-radius: 10px;
+    border-width:0px;
+}
 /*  PAGE d'ACCUEIL   */
-a.no-underline:hover {
+a.no-underline:hover, a.no-underline:focus {
     text-decoration: none;
 }
 .panel {
@@ -168,6 +172,11 @@ a.no-underline:hover {
 .form-signin input[type="password"] {
   margin-bottom: 10px;
   border-radius: 0 0 4px 4px;
+}
+.jumbotron {
+    border-radius:10px;
+    border: 2px solid #ddd;
+    box-shadow: none;
 }
 
 /*   NAVBAR  */

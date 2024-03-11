@@ -4,6 +4,7 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,10 +24,16 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class,    array('label' => 'E-mail'        ,'required' => false))
+            ->add('email', EmailType::class,    array('label' => 'E-mail *'        ,'required' => true))
             ->add('firstname',TextType::class,  array('label' => 'Prénom'        ,'required' => false))
-            ->add('lastname',TextType::class,   array('label' => 'Nom *'         ,'required' => true))
-            ->add('username',TextType::class,   array('label' => 'Identifiant de connexion * (généralement identique au nom)' ,'required' => true));
+            ->add('lastname',TextType::class,   array('label' => 'Nom *'         ,'required' => true));
+        if (!$options['is_new']) {
+            $builder->add('username',TextType::class, array('label' => 'Identifiant de connexion' ,'required' => true));
+        }
+        else {
+            $builder->add('username',HiddenType::class, array('required' => true));
+        }
+
         if ($options['from_admin']) {
             $builder->add('password',PasswordType::class,   array('label' => 'Mot de passe *','required' => true));
             $builder->add('isAdherent', CheckboxType::class, array('label' => 'Adhérent', 'required' => false, 'attr' => array('checked' => 'checked')));
@@ -40,14 +47,6 @@ class UserType extends AbstractType
             $builder->add('town',TextType::class, array('label'=>'Ville', 'required' => false));            
         }
         
-        if ($options['is_new']) {
-            $builder->add('sendMail',CheckboxType::class,array(
-                'label' => 'Envoyer un mail à l\'adhérent',
-                'required' => false, 
-                'mapped' => false,
-                'attr' => array('checked'   => 'checked')));
-        }
-
         $builder->add('submit', SubmitType::class, ['label' => 'Mettre à jour','attr' => ['class' => 'pull-right btn-primary']]);
         $builder->add('cancel', ButtonType::class, ['label' => 'Annuler','attr' => ['onclick'=>'window.history.go(-1); return false;']]);
     }

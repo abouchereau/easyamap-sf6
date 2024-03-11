@@ -58,7 +58,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     {
         return $this
             ->createQueryBuilder('u')
-            ->addOrderBy('u.isActive', 'DESC')
+           // ->addOrderBy('u.isActive', 'DESC')
             ->addOrderBy('u.lastname')
             ->getQuery()
             ->getResult();

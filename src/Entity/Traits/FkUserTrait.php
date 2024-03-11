@@ -4,35 +4,13 @@
 namespace App\Entity\Traits;
  
 use Doctrine\ORM\Mapping as ORM;
- 
+use Doctrine\ORM\Mapping\JoinColumn;
+
 trait FkUserTrait
 {
-    /**
-     * @var \User
-     *
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="fk_user", referencedColumnName="id_user")
-     * })
-     * @ORM\OrderBy({"isActive" = "DESC", "lastname" = "ASC"})
-     */
-    private $fkUser;
-    
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[JoinColumn(name: "id_user", referencedColumnName: "id")]
+    #[ORM\OrderBy(["isActive" => "DESC", "lastname" => "ASC"])]
+    private $idUser;
 
-    public function setFkUser(\App\Entity\User $fkUser = null)
-    {
-        $this->fkUser = $fkUser;
-
-        return $this;
-    }
-
-    /**
-     * Get fkUser
-     *
-     * @return \App\Entity\User 
-     */
-    public function getFkUser()
-    {
-        return $this->fkUser;
-    }
 }
