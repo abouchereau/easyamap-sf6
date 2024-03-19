@@ -83,6 +83,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[InverseJoinColumn(name: "id_user", referencedColumnName: "id")]
     private Collection $farms;
 
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->setCreatedAt(new \DateTime());
+    }
+
     public function getUserIdentifier(): string
     {
         return (string) $this->username;

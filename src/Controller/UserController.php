@@ -135,33 +135,38 @@ final class UserController extends AbstractController
         ));
     }
 
-    /**
-     * Creates a form to create a User entity.
-     *
-     * @param User $entity The entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createCreateForm(User $entity, bool $withAddress)
-    {
-        $form = $this->createForm(UserType::class, $entity, array(
-            'action' => $this->generateUrl('user_create'),
-            'method' => 'POST',
-            'is_new' => true,
-            'with_address' => $withAddress,
-            'from_admin' => false
-        ));
 
-        $form->add('submit', SubmitType::class, array('label' => 'Create'));
-
-        return $form;
-    }
-
-    #[Route('/new', name: 'user_new', methods: ['GET']), IsGranted(User::ROLE_ADMIN)]
-    public function new(SettingRepository $settingRepository)
+    #[Route('/new', name: 'user_new', methods:  ['GET', 'POST']), IsGranted(User::ROLE_ADMIN)]
+    public function new(SettingRepository $settingRepository,
+                        EntityManagerInterface $entityManager)
     {
         $entity = new User();
-        $form = $this->createCreateForm($entity, $settingRepository->get('useAddress', $_SERVER['APP_ENV']));
+        $form = $this->createForm(UserType::class, $entity, array(
+            'method' => 'POST',
+            'is_new' => true,
+            'with_address' => $settingRepository->get('useAddress', $_SERVER['APP_ENV']),
+            'from_admin'));
+        //$form->add('submit', SubmitType::class, array('label' => 'Create'));
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $entityManager->flush();
+                $this->addFlash('success', 'L\'utilisateur a été ajouté.');
+
+             /*   $mailSent = $this->sendMail($entity->getEmail(),$entity->getUsername(),$entity->getPassword());
+                if ($mailSent)
+                    $this->addFlash('notice', 'Un mail a été envoyé à l\'adhérent avec ses identifiants.');
+                else
+                    $this->addFlash('error', 'Echec lors de l\'envoi du mail à l\'adhérent.');*/
+                return $this->redirect($this->generateUrl('user'));
+            }
+            else {
+                $this->get('session')->getFlashBag()->add('error', 'Problème lors de l\'enregistrement des données '.$form->getErrors(true, false));
+            }
+
+
+            return $this->redirectToRoute('user_edit', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->render('User/new.html.twig', array(
             'entity' => $entity,
             'form'   => $form->createView(),
@@ -185,21 +190,6 @@ final class UserController extends AbstractController
         ));
     }
 
-    /**
-     * Creates a form to edit a User entity.
-     *
-     * @param User $entity The entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createEditForm(string $type, mixed $data = null, array $options = [])
-    {
-
-
-
-
-        return $form;
-    }
     /**
      * Edits an existing User entity.
      *
@@ -279,6 +269,8 @@ final class UserController extends AbstractController
     }
 
     protected function sendMail($email, $lastname, $password) {
+        //création d'un mot de passe temporaire à modifier lors de la 1ere connexion
+
         //$url = 'http://contrats.la-riche-en-bio.com';
         $msg = $this->renderView('Emails/new_user.html.twig',
             array('lastname' => $lastname,'password' => $password)
