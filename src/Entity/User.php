@@ -42,6 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $username = null;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
+    #[Assert\NotBlank]
     #[Assert\Email]
     private ?string $email = null;
 
@@ -201,26 +202,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // add $this->salt too if you don't use Bcrypt or Argon2i
         [$this->id, $this->username, $this->password] = $data;
-    }
-
-    public function getIsAdmin(): bool
-    {
-        return $this->isAdmin;
-    }
-
-    public function setIsAdmin(bool $isAdmin): void
-    {
-        $this->isAdmin = $isAdmin;
-    }
-
-    public function getIsAdherent(): bool
-    {
-        return $this->isAdherent;
-    }
-
-    public function setIsAdherent(bool $isAdherent): void
-    {
-        $this->isAdherent = $isAdherent;
     }
 
     public function getLastConnection(): ?\DateTime

@@ -35,7 +35,7 @@ class UserType extends AbstractType
         }
 
         if ($options['from_admin']) {
-            $builder->add('password',PasswordType::class,   array('label' => 'Mot de passe *','required' => true));
+            //$builder->add('password',PasswordType::class,   array('label' => 'Mot de passe *','required' => true));
             $builder->add('isAdherent', CheckboxType::class, array('label' => 'Adhérent', 'required' => false, 'attr' => array('checked' => 'checked')));
             $builder->add('isAdmin', CheckboxType::class, array('label' => 'Administrateur', 'required' => false));
         }

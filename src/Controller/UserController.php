@@ -138,18 +138,21 @@ final class UserController extends AbstractController
 
     #[Route('/new', name: 'user_new', methods:  ['GET', 'POST']), IsGranted(User::ROLE_ADMIN)]
     public function new(SettingRepository $settingRepository,
-                        EntityManagerInterface $entityManager)
+                        EntityManagerInterface $entityManager,
+                        Request $request)
     {
         $entity = new User();
         $form = $this->createForm(UserType::class, $entity, array(
             'method' => 'POST',
             'is_new' => true,
             'with_address' => $settingRepository->get('useAddress', $_SERVER['APP_ENV']),
-            'from_admin'));
+            'from_admin'=> true));
+        $form->handleRequest($request);
+        $entity->setUsername($request->request->all()["user"]["email"]);
         //$form->add('submit', SubmitType::class, array('label' => 'Create'));
-
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
+
                 $entityManager->flush();
                 $this->addFlash('success', 'L\'utilisateur a été ajouté.');
 
