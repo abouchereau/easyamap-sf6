@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::STRING)]
+    #[ORM\Column(type: Types::STRING, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::JSON)]
@@ -75,10 +75,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 255)]
     private ?string $town;
 
-    #[ORM\Column(type: Types::STRING, length: 100)]
+    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
     private ?string $resetToken;
 
-    #[ManyToMany(targetEntity: Farm::class)]
+    #[ManyToMany(targetEntity: Farm::class, nullable: true)]
     #[JoinTable(name: "referent")]
     #[JoinColumn(name: "id_farm", referencedColumnName: "id")]
     #[InverseJoinColumn(name: "id_user", referencedColumnName: "id")]
@@ -133,6 +133,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): void
     {
         $this->roles = $roles;
+    }
+
+    private function addRole(string $role) {
+        if (!in_array($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
+    }
+
+    private function removeRole(string $role) {
+        if (($key = array_search($role, $this->roles)) !== false) {
+            unset($this->roles[$key]);
+        }
     }
 
     public function hasRole($role):bool {
@@ -309,6 +321,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdherent(): bool
     {
         return $this->hasRole(User::ROLE_ADHERENT);
+    }
+
+    public function setIsAdherent(bool $isAdherent) {
+        if ($isAdherent) {
+            $this->addRole(self::ROLE_ADHERENT);
+        }
+        else {
+            $this->removeRole(self::ROLE_ADHERENT);
+        }
+
     }
 
     public function getFarms(): Collection

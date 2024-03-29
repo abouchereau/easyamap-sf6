@@ -31,12 +31,12 @@ class UserType extends AbstractType
             $builder->add('username',TextType::class, array('label' => 'Identifiant de connexion' ,'required' => true));
         }
         else {
-            $builder->add('username',HiddenType::class, array('required' => true));
+            $builder->add('username',TextType::class, array('required' => true));
         }
 
         if ($options['from_admin']) {
             //$builder->add('password',PasswordType::class,   array('label' => 'Mot de passe *','required' => true));
-            $builder->add('isAdherent', CheckboxType::class, array('label' => 'Adhérent', 'required' => false, 'attr' => array('checked' => 'checked')));
+            $builder->add('isAdherent', CheckboxType::class, array('label' => 'Peut passer des commandes ?', 'required' => false, 'attr' => array('checked' => 'checked')));
             $builder->add('isAdmin', CheckboxType::class, array('label' => 'Administrateur', 'required' => false));
         }
         if ($options['with_address']) {

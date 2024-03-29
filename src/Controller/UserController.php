@@ -147,12 +147,14 @@ final class UserController extends AbstractController
             'is_new' => true,
             'with_address' => $settingRepository->get('useAddress', $_SERVER['APP_ENV']),
             'from_admin'=> true));
+        //$all = $request->request->all($form->getName());
+        //$all['username'] = "youpi";
+        //$request->request->replace($all);
         $form->handleRequest($request);
-        $entity->setUsername($request->request->all()["user"]["email"]);
         //$form->add('submit', SubmitType::class, array('label' => 'Create'));
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-
+                die("iop");
                 $entityManager->flush();
                 $this->addFlash('success', 'L\'utilisateur a été ajouté.');
 
@@ -164,11 +166,15 @@ final class UserController extends AbstractController
                 return $this->redirect($this->generateUrl('user'));
             }
             else {
-                $this->get('session')->getFlashBag()->add('error', 'Problème lors de l\'enregistrement des données '.$form->getErrors(true, false));
+                $this->addFlash('error', 'Problème lors de l\'enregistrement des données '.$form->getErrors(true, false));
+                return $this->render('User/new.html.twig', array(
+                    'entity' => $entity,
+                    'form'   => $form->createView(),
+                ));
             }
 
 
-            return $this->redirectToRoute('user_edit', [], Response::HTTP_SEE_OTHER);
+            //return $this->redirectToRoute('user_new', [], Response::HTTP_SEE_OTHER);
         }
         return $this->render('User/new.html.twig', array(
             'entity' => $entity,
