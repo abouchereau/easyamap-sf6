@@ -28,10 +28,7 @@ class UserType extends AbstractType
             ->add('firstname',TextType::class,  array('label' => 'Prénom'        ,'required' => false))
             ->add('lastname',TextType::class,   array('label' => 'Nom *'         ,'required' => true));
         if (!$options['is_new']) {
-            $builder->add('username',TextType::class, array('label' => 'Identifiant de connexion' ,'required' => true));
-        }
-        else {
-            $builder->add('username',TextType::class, array('required' => true));
+            $builder->add('username',TextType::class, array('label' => 'Identifiant de connexion'));
         }
 
         if ($options['from_admin']) {

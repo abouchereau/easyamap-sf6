@@ -23,6 +23,8 @@ use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -139,7 +141,8 @@ final class UserController extends AbstractController
     #[Route('/new', name: 'user_new', methods:  ['GET', 'POST']), IsGranted(User::ROLE_ADMIN)]
     public function new(SettingRepository $settingRepository,
                         EntityManagerInterface $entityManager,
-                        Request $request)
+                        Request $request,
+                        TokenGeneratorInterface $tokenGenerator,)
     {
         $entity = new User();
         $form = $this->createForm(UserType::class, $entity, array(
@@ -147,16 +150,17 @@ final class UserController extends AbstractController
             'is_new' => true,
             'with_address' => $settingRepository->get('useAddress', $_SERVER['APP_ENV']),
             'from_admin'=> true));
-        //$all = $request->request->all($form->getName());
-        //$all['username'] = "youpi";
-        //$request->request->replace($all);
         $form->handleRequest($request);
-        //$form->add('submit', SubmitType::class, array('label' => 'Create'));
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                die("iop");
+                $token = $tokenGenerator->generateToken();
+                $entity->setResetToken($token);
+                $url = $this->generateUrl('reset_pass', ['token' => $token, 'is_new_user'=>true], UrlGeneratorInterface::ABSOLUTE_URL);
+
+                $entityManager->persist($entity);
                 $entityManager->flush();
                 $this->addFlash('success', 'L\'utilisateur a été ajouté.');
+
 
              /*   $mailSent = $this->sendMail($entity->getEmail(),$entity->getUsername(),$entity->getPassword());
                 if ($mailSent)
@@ -166,20 +170,17 @@ final class UserController extends AbstractController
                 return $this->redirect($this->generateUrl('user'));
             }
             else {
-                $this->addFlash('error', 'Problème lors de l\'enregistrement des données '.$form->getErrors(true, false));
-                return $this->render('User/new.html.twig', array(
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                ));
+                $this->addFlash('error', 'Problème lors de l\'enregistrement des données ');
             }
-
-
-            //return $this->redirectToRoute('user_new', [], Response::HTTP_SEE_OTHER);
         }
         return $this->render('User/new.html.twig', array(
             'entity' => $entity,
             'form'   => $form->createView(),
         ));
+    }
+
+    private function generateToken($user, $tokenGenerator){
+
     }
 
 

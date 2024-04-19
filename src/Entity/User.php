@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -37,9 +38,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::STRING, unique: true)]
-    #[Assert\NotBlank]
-    #[Assert\Length(min: 2, max: 50)]
-    private ?string $username = null;
+    #[Assert\Length( max: 50)]
+    private ?string $username = "";
 
     #[ORM\Column(type: Types::STRING, unique: true)]
     #[Assert\NotBlank]
@@ -51,9 +51,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable:true)]
-    private ?\DateTime $lastConnection = null;
 
     #[ORM\Column(name:"tel1", type: Types::STRING, nullable:true)]
     #[Assert\Length(max: 255)]
@@ -78,16 +75,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
     private ?string $resetToken;
 
-    #[ManyToMany(targetEntity: Farm::class, nullable: true)]
+    #[ManyToMany(targetEntity: Farm::class)]
     #[JoinTable(name: "referent")]
     #[JoinColumn(name: "id_farm", referencedColumnName: "id")]
     #[InverseJoinColumn(name: "id_user", referencedColumnName: "id")]
     private Collection $farms;
 
+    public function __construct()
+    {
+        $this->farms = new ArrayCollection();
+    }
+
     #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->setCreatedAt(new \DateTime());
+        $this->setUsername($this->getEmail());
+        $this->setIsActive(true);
     }
 
     public function getUserIdentifier(): string
@@ -216,16 +220,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [$this->id, $this->username, $this->password] = $data;
     }
 
-    public function getLastConnection(): ?\DateTime
-    {
-        return $this->lastConnection;
-    }
-
-
-    public function setLastConnection(?\DateTime $lastConnection): void
-    {
-        $this->lastConnection = $lastConnection;
-    }
 
     public function getTel1(): ?string
     {
@@ -330,7 +324,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         else {
             $this->removeRole(self::ROLE_ADHERENT);
         }
+    }
 
+    public function setIsActive(bool $isActive) {
+        if ($isActive) {
+            $this->addRole(self::ROLE_USER);
+        }
+        else {
+            $this->removeRole(self::ROLE_USER);
+        }
+    }
+
+    public function setIsAdmin(bool $isAdmin) {
+        if ($isAdmin) {
+            $this->addRole(self::ROLE_ADMIN);
+        }
+        else {
+            $this->removeRole(self::ROLE_ADMIN);
+        }
     }
 
     public function getFarms(): Collection
@@ -340,6 +351,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
         return $this->farms;
     }
+
     public function setFarms(Collection $farms): void
     {
         $this->farms = $farms;

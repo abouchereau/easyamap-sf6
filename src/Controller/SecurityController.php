@@ -113,7 +113,7 @@ final class SecurityController extends AbstractController
                 $entityManager->flush();
 
                 // On génère un lien de réinitialisation du mot de passe
-                $url = $this->generateUrl('reset_pass', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+                $url = $this->generateUrl('reset_pass', ['token' => $token, 'is_new_user'=>false], UrlGeneratorInterface::ABSOLUTE_URL);
                 die($url);
                 $txt = "Bonjour ".$user->getFirstname()." ".$user->getLastname().",
 
@@ -146,9 +146,10 @@ Sinon, veuillez cliquer sur ce lien pour modifier votre mot de passe : ".$url.""
         ]);
     }
 
-    #[Route('/oubli-pass/{token}', name:'reset_pass')]
+    #[Route('/initialisation-mot-de-passe/{is_new_user}/{token}', name:'reset_pass')]
     public function resetPass(
         string $token,
+        boolean $is_new_user,
         Request $request,
         UserRepository $usersRepository,
         EntityManagerInterface $entityManager,
@@ -185,7 +186,8 @@ Sinon, veuillez cliquer sur ce lien pour modifier votre mot de passe : ".$url.""
             }
 
             return $this->render('security/reset_password.html.twig', [
-                'form' => $form->createView()
+                'form' => $form->createView(),
+                'is_new_user' => $is_new_user
             ]);
         }
 

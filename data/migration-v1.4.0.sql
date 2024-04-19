@@ -27,3 +27,4 @@ ALTER TABLE user DROP COLUMN is_active;
 ALTER TABLE user DROP COLUMN is_adherent;
 ALTER TABLE user DROP COLUMN is_admin;
 ALTER TABLE user DROP COLUMN last_connection;
+ALTER TABLE user MODIFY password VARCHAR(255) NULL;
